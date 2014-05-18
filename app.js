@@ -19,35 +19,61 @@ app.use(function(req, res, next){
   next();
 });
 
-// express provides static-directory handler middleware
-app.use(express.static(__dirname + '/public'));
+
+function inspect(req,res) {
+  var s = '<style type="text/css">body{font-family:courier;}</style>';
+  s += '<table class="a">';
+  ['host','method','url','path','params','body','query','route','cookies',function(x){res.send(x)}].forEach(function(elt){
+    if ( !(elt instanceof Function) )
+      s += '<tr><td><b>'+elt+'</b></td><td>' + JSON.stringify(req[elt]) + '</td></tr>';
+    else
+      elt(s+'</table>'); 
+  });
+}
+
 
 // catch POST
-app.post("/login",function(req,res) {
-
-  console.log( "in POST handler:" );
-  
-  if ( req.params ) {
-      var s = '';
-      function _f(x) { res.send(x); }
-      ['method','url','params','body','query','route','cookies','path','host',_f].forEach(function(x){
-          if ( x instanceof Function )
-              x(s); 
-          else
-              s += '<b>' + x + '</b><br><pre> ' + JSON.stringify(req[x]) + '</pre>';
-      });
-  } else
-  res.send('Hello World');
+app.post("/login",function(req,res) 
+{
+  console.log( "in /login POST handler:" );
+  return inspect(req,res);
 });
 
+app.get("/", function(req,res,next) 
+{
+  console.log( "in / GET handler:" );
+  inspect(req,res);
+  next();
+});
+
+// express provided static-directory handler middleware
+app.use(express.static(__dirname + '/public'));
+
 //
-// the reason why error handlers appear at the end of the chain
-//  is because none of the other handlers, static or renderers,
-//  handled the request; so it fell through to here; the error
-//  handler is the catch-all at the end of the chain
+// error handlers
+//
+// there is a reason why error handlers appear at the end of the chain
+//  because none of the other handlers, handled the request; 
+//  so it fell through to the bottom; the error handler is 
+//  the catch-all at the end of the chain
 // 
-app.use(function(req, res){
-  res.send('Hello World');
+
+/// catch 404 and forwarding to error handler
+app.use(function(req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
+
+
+// development error handler
+// will print stacktrace
+app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.send( '<pre>'+JSON.stringify({
+        message: err.message,
+        error: err
+    },null, '  ')+'</pre>');
 });
 
 app.listen(3000);
