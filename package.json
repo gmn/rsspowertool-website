@@ -1,0 +1,40 @@
+{
+  "name": "rsspowertool-website",
+  "version": "0.0.1",
+  "author": {
+    "name": "Greg Naughton",
+    "email": "greg@naughton.org"
+  },
+  "description": "A website that I hope becomes the best RSS Reader of all time",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gmn/rsspowertool-website.git"
+  },
+  "homepage": "https://github.com/gmn/rsspowertool-website",
+  "licenses": [
+    {
+      "type": "GPLv3",
+      "url": "http://www.gnu.org/licenses/lgpl.txt"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/gmn/rsspowertool-website/issues"
+  },
+  "private": true,
+  "engines": {
+    "node": "0.10.x"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "deploy": "git push heroku master"
+  },
+  "dependencies": {
+    "express-session": "~1.1.0",
+    "cookie-parser": "~1.0.1",
+    "body-parser": "~1.0.0",
+    "express": "~4.0.0",
+    "pg": "3.x"
+  },
+  "readmeFilename": "README.md",
+  "readme": "nothing yet"
+}
