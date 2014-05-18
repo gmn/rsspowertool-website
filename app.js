@@ -1,6 +1,9 @@
+
+// support/modules
+var lib = require( './lib.js' );
+var db = require('./db.js');
+
 // express
-
-
 var express = require('express');
 var app = express();
 
@@ -31,23 +34,47 @@ function inspect(req,res) {
   });
 }
 
-
-// catch POST
-app.post("/login",function(req,res) 
-{
-  console.log( "in /login POST handler:" );
-  return inspect(req,res);
-});
-
+// only handles if a query is present 
 app.get("/", function(req,res,next) 
 {
-  console.log( "in / GET handler:" );
-  inspect(req,res);
-  next();
+  if ( lib.objEmpty(req.query) )
+    next();
+  else {
+    console.log( "using GET query handler:" );
+    inspect(req,res);
+  }
 });
+
+app.get('/users', function(req,res,next) {
+  db.get_users(function(rows) {
+      res.writeHead(200, {"Content-Type": "text/html"});
+      res.write('<pre>'+JSON.stringify(rows,null,'  ')+'</pre>');
+      res.end();
+  } );
+});
+
+// catch POST
+app.post("/login",function(req,res,next) 
+{
+  console.log( "using /login POST handler:" );
+  //return inspect(req,res);
+
+  // sanitize
+  var form = {};
+  for (i in req.body) {
+    if ( req.body.hasOwnProperty(i) )
+      form[i] = req.body[i] ? req.body[i].trim() : '';
+  }
+
+  db.query( "INSERT INTO users(username,password,email,date_added) VALUES ('"+form.username+"','"+form.password+"','"+form.email+"',NOW());" );
+
+  res.redirect('/users');
+});
+
 
 // express provided static-directory handler middleware
 app.use(express.static(__dirname + '/public'));
+
 
 //
 // error handlers
