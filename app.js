@@ -46,11 +46,13 @@ app.get("/", function(req,res,next)
 });
 
 app.get('/users', function(req,res,next) {
-  db.get_users(function(rows) {
-      res.writeHead(200, {"Content-Type": "text/html"});
-      res.write('<pre>'+JSON.stringify(rows,null,'  ')+'</pre>');
-      res.end();
-  } );
+  //db.get_users(function(rows) {
+  db.query( 'select * from users order by id desc',
+    function(rows) {
+        res.writeHead(200, {"Content-Type": "text/html"});
+        res.write('<pre>'+JSON.stringify(rows,null,'  ')+'</pre>');
+        res.end();
+    } );
 });
 
 // catch POST
